@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  chats     Chat[]
+  datasets   Dataset[]
+}
+
+model Chat {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  datasets   Dataset[]
+  modelUrl String?
+  preprocessorUrl String?
+  trainingUrl String?
+  chatsColumns DatasetColumn[]
+
+}
+
+model Dataset {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  chatsId     Int
+  datasetUrl String
+  isTraining  Boolean  @default(false)
+  edaUrls    EDAURLS[]
+  prediction Prediction?
+  user        User     @relation(fields: [userId], references: [id])
+  chats       Chat    @relation(fields: [chatsId], references: [id])
+
+}
+model EDAURLS {
+  id        Int      @id @default(autoincrement())
+  datasetId Int
+  url       String
+  dataset   Dataset  @relation(fields: [datasetId], references: [id])
+}
+model DatasetColumn {
+  id        Int      @id @default(autoincrement())
+  chatsId   Int
+  columnName String
+  columnType String
+  chats    Chat  @relation(fields: [chatsId], references: [id])
+}
+
+model Prediction {
+  id        Int      @id @default(autoincrement())
+  datasetId   Int  @unique
+  predictionUrl String?
+  dataset    Dataset  @relation(fields: [datasetId], references: [id])
+}
