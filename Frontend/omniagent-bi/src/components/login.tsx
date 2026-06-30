@@ -6,7 +6,7 @@ import {useRef, useState} from 'react';
 export default function Login() {
     const email = useRef<HTMLInputElement>(null);
     const password = useRef<HTMLInputElement>(null);
-    const [isSignedIn, setIsSignedIn] = useAtom(isSignedInState);
+    const [, setIsSignedIn] = useAtom(isSignedInState);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 

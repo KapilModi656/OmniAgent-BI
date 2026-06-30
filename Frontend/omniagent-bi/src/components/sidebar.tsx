@@ -76,21 +76,6 @@ export default function Sidebar() {
       .filter((chat) => chat.id > 0);
   }
 
-  function syncChats(payload: unknown) {
-    const parsed = normalizeChats(payload);
-    setChats(parsed);
-    if (parsed.length === 0) {
-      setCurrentChat(null);
-      return;
-    }
-
-    if (!parsed.some((chat) => chat.id === currentChat)) {
-      // By default select the newest chat (first in sorted list)
-      const newestChat = [...parsed].sort((a, b) => b.id - a.id)[0];
-      setCurrentChat(newestChat.id);
-    }
-  }
-
   const fetchChats = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE}/chats/list`, {
@@ -98,12 +83,23 @@ export default function Sidebar() {
         headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
       });
       const data = await res.json();
-      syncChats(data);
+      
+      const parsed = normalizeChats(data);
+      setChats(parsed);
+      
+      setCurrentChat((prevCurrentChat) => {
+        if (parsed.length === 0) return null;
+        if (!parsed.some((chat) => chat.id === prevCurrentChat)) {
+          // By default select the newest chat (first in sorted list)
+          const newestChat = [...parsed].sort((a, b) => b.id - a.id)[0];
+          return newestChat.id;
+        }
+        return prevCurrentChat;
+      });
     } catch (error) {
       console.error('Error fetching chats:', error);
     }
-  }, [setChats, currentChat, setCurrentChat]);
-
+  }, [setChats, setCurrentChat]);
   useEffect(() => {
     fetchChats();
   }, [fetchChats]);

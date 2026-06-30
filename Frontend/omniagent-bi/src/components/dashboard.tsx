@@ -145,7 +145,7 @@ function Dashboard() {
             setEdaUrlsState([]);
         }
         currentChatRef.current = currentChat;
-    }, [currentChat]);
+    }, [currentChat,setEdaUrlsState]);
 
     const selectedChat = useMemo(
         () => chats.find((chat) => chat.id === currentChat) ?? null,
@@ -166,7 +166,7 @@ function Dashboard() {
         } catch {
             return null;
         }
-    }, [selectedChat?.modelMetrics]);
+    }, [selectedChat]);
 
     const setLoading = useCallback((key: keyof typeof loadingState, value: boolean) => {
         setLoadingState((prev) => ({ ...prev, [key]: value }));
@@ -257,9 +257,13 @@ function Dashboard() {
                 setDatasetItems(parsed);
                 
                 // Find training dataset and extract edaUrls if present
-                const trainingItem = rawList.find(item => item && typeof item === 'object' && (item as any).isTraining);
-                if (trainingItem && Array.isArray((trainingItem as any).edaUrls)) {
-                    setEdaUrlsState((trainingItem as any).edaUrls.map((u: any) => typeof u === 'string' ? u : u.url).filter(Boolean));
+                const trainingItem = rawList.find(item => item && typeof item === 'object' && Boolean((item as Record<string, unknown>).isTraining || (item as Record<string, unknown>).is_training)) as Record<string, unknown> | undefined;
+                if (trainingItem && Array.isArray(trainingItem.edaUrls)) {
+                    setEdaUrlsState(trainingItem.edaUrls.map((u: unknown) => {
+                        if (typeof u === 'string') return u;
+                        if (u && typeof u === 'object' && typeof (u as Record<string, unknown>).url === 'string') return (u as Record<string, unknown>).url;
+                        return '';
+                    }).filter(Boolean) as string[]);
                 } else {
                     setEdaUrlsState([]);
                 }
@@ -273,7 +277,7 @@ function Dashboard() {
 
         setDatasetItems([]);
         setLoading('datasets', false);
-    }, [setLoading]);
+    }, [setLoading, setEdaUrlsState]);
 
     const loadEdaPlots = useCallback(async (paths: string[]) => {
         if (paths.length === 0) {

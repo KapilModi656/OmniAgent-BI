@@ -38,8 +38,8 @@ export default function Navbar() {
           method: 'GET',
           headers: getAuthHeaders(),
         });
-        if (res && typeof res === 'object' && (res as any).user) {
-          setUserProfile((res as any).user);
+        if (res && typeof res === 'object' && (res as Record<string, unknown>).user) {
+          setUserProfile((res as Record<string, unknown>).user as { name: string; email: string });
         }
       } catch (err) {
         console.error('Failed to fetch user', err);
