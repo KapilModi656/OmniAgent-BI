@@ -130,3 +130,21 @@ async def getFile(file_path: str):
     f = modal.Function.from_name("omniAgent-Sandbox-Runner", "get_file")
     content = await f.remote.aio(file_path)
     return content
+
+@app.function(volumes={"/vault": volume})
+async def save_file(file_path: str, content: bytes):
+    """
+    Save a file to the volume directly
+    """
+    import os
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, "wb") as f:
+        f.write(content)
+    volume.commit()
+
+async def saveFile(file_path: str, content: bytes):
+    """
+    Async version of save_file to write file content to the volume
+    """
+    f = modal.Function.from_name("omniAgent-Sandbox-Runner", "save_file")
+    await f.remote.aio(file_path, content)

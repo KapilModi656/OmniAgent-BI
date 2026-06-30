@@ -201,23 +201,12 @@ async def upload_file(userid: str = Form(...), chatid: str = Form(...), file: Up
         A success message confirming the upload of the file.
     """
     file_bytes = await file.read()
-    encoded_file_bytes = base64.b64encode(file_bytes).decode('utf-8')
     filename = file.filename
     import time
     timestamp = int(time.time())
     file_location = f"/vault/models/{userid}/{chatid}/dataset_{timestamp}_{filename}"
-    code = f"""
-import base64
-import os
-encoded_data = "{encoded_file_bytes}"
-file_bytes = base64.b64decode(encoded_data)
-dataset_path = "{file_location}"
-os.makedirs("/vault/models/{userid}/{chatid}", exist_ok=True)
-with open(dataset_path, "wb") as f:
-    f.write(file_bytes)
-"""
-
-    await running_code(code=code, userid=userid, chatid=chatid, dataset_url=None)
+    from src.utils import saveFile
+    await saveFile(file_location, file_bytes)
     return {"status": "success", "filepath": file_location, "message": f"File {file.filename} uploaded successfully."}
 
 class GetFileRequest(BaseModel):
