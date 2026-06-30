@@ -334,6 +334,7 @@ function Dashboard() {
             setEdaUrlsState(Array.isArray(nextEda) ? nextEda.map(String) : []);
             await fetchChats();
             await fetchDatasets(currentChat);
+            await fetchColumns(currentChat);
             setTrainFile(null);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Training failed');
@@ -567,8 +568,8 @@ function Dashboard() {
                                                 plot_bgcolor: themeMode === 'dark' ? '#020617' : '#ffffff',
                                                 font: { color: themeMode === 'dark' ? '#f8fafc' : '#0f172a' },
                                             }}
+                                            useResizeHandler={true}
                                             style={{ width: '100%', height: '340px' }}
-                                            useResizeHandler
                                             config={{ displaylogo: false, responsive: true }}
                                         />
                                     )}

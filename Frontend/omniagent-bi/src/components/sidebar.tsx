@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useAtom} from 'jotai';
-import {Chats, CurrentChat, type ChatItem} from '../store/store';
+import {Chats, CurrentChat, isSidebarOpenAtom, type ChatItem} from '../store/store';
 import {API_BASE, getAuthHeaders} from '../utils';
 
 const BASE_CHAT_NAME = 'New Chat';
@@ -43,6 +43,7 @@ function ActionButton({
 export default function Sidebar() {
   const [chats, setChats] = useAtom(Chats);
   const [currentChat, setCurrentChat] = useAtom(CurrentChat);
+  const [isSidebarOpen, setIsSidebarOpen] = useAtom(isSidebarOpenAtom);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
   const [newChatName, setNewChatName] = useState('');
   const [editingChatId, setEditingChatId] = useState<string | null>(null);
@@ -214,7 +215,17 @@ export default function Sidebar() {
   }
 
   return (
-    <div className="flex h-full w-72 flex-col border-r border-border bg-card text-foreground shadow-sm transition-colors duration-300">
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/50 md:hidden backdrop-blur-sm transition-opacity" 
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+      
+      <div className={`fixed inset-y-0 left-0 z-50 flex h-full w-72 flex-col border-r border-border bg-card text-foreground shadow-xl transition-transform duration-300 md:static md:shadow-sm md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+
       <div className="border-b border-border p-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold tracking-wide">Chats</h2>
@@ -300,5 +311,6 @@ export default function Sidebar() {
         })}
       </ul>
     </div>
+    </>
   );
 }

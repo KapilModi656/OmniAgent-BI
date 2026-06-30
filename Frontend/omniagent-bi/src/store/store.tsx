@@ -1,6 +1,7 @@
 import {atom} from 'jotai';
 
 export const isSignedInState = atom(false);
+export const isSidebarOpenAtom = atom(false);
 
 export interface ChatItem {
 	id: number;

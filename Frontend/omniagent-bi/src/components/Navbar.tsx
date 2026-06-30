@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { themeModeAtom, userProfileAtom, isSignedInState } from '../store/store';
+import { isSidebarOpenAtom, themeModeAtom, userProfileAtom, isSignedInState } from '../store/store';
 import { useEffect, useState, useRef } from 'react';
 import { API_BASE, getAuthHeaders, tryJson } from '../utils';
 
@@ -7,6 +7,7 @@ export default function Navbar() {
   const [themeMode, setThemeMode] = useAtom(themeModeAtom);
   const [userProfile, setUserProfile] = useAtom(userProfileAtom);
   const [, setIsSignedIn] = useAtom(isSignedInState);
+  const [isSidebarOpen, setIsSidebarOpen] = useAtom(isSidebarOpenAtom);
   
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -61,12 +62,21 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-6 shadow-sm z-10 transition-colors duration-300">
-      <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold shadow-md">
-          O
+    <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-4 md:px-6 shadow-sm z-10 transition-colors duration-300">
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="md:hidden flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          aria-label="Toggle Sidebar"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        </button>
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold shadow-md">
+            O
+          </div>
+          <span className="text-lg font-bold text-foreground hidden sm:inline-block">OmniAgent BI</span>
         </div>
-        <span className="text-lg font-bold text-foreground">OmniAgent BI</span>
       </div>
 
       <div className="flex items-center gap-4">

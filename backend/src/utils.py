@@ -5,8 +5,7 @@ import contextlib
 import pickle
 import os
 import json
-import pandas as pd
-import plotly.express as px
+
 import traceback
 image = modal.Image.debian_slim().pip_install(
     "pandas",
@@ -64,6 +63,12 @@ def run_code(code:str, userid:str, chatid:str, dataset_url: str | None = None, m
       
         with contextlib.redirect_stdout(stdout_capture):
             exec(code, globals(), local_scope)
+            
+        # Ensure all logging file handlers are closed to release Volume locks
+        import logging
+        for handler in logging.root.handlers[:]:
+            handler.close()
+            logging.root.removeHandler(handler)
             
         volume.commit()
             
